@@ -1,5 +1,5 @@
 name: Publish Gallery
-on: [push, workflow_dispatch]
+on: [workflow_dispatch]
 
 permissions:
   id-token: write
@@ -8,7 +8,6 @@ permissions:
 jobs:
   deploy:
     name: Publish Gallery to Github Pages
-    if: ${{ github.repository != 'gautamkrishnar/github-pages-gallery' && github.event.head_commit.message != '' && github.event.head_commit.message != 'Initial commit' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
@@ -27,10 +26,7 @@ jobs:
         with:
           artifact_name: gh-pages
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Delete artifact 🗑️
-        uses: geekyeggo/delete-artifact@v4
-        with:
-          name: gh-pages
+
 
       - name: Upload To Gphotos & Autumn Dusk
         run: |
@@ -38,12 +34,9 @@ jobs:
           ${{ secrets.OBJSTACK_RCLONE_CONF }}
           EOF
           sudo apt install -y rclone
-          rclone --config rclone.conf copy -v --check-first \
-          --size-only --max-size 1G --max-age 30d -u \
-          --exclude ".gitkeep" --exclude ".DS_Store" \
-          --no-update-modtime "gallery/" Gdrive-IILM:/Github/imagestack.github.io/gallery/
       
           files=($(git --no-pager show --oneline --name-only --pretty='' HEAD))
+          echo $files
           
           if (( ${#files[@]} <= 4 ));
           then
@@ -57,15 +50,11 @@ jobs:
           	  *gallery/desktop-wallpapers* )
                 rclone --config rclone.conf copy -v --check-first --size-only --ignore-existing --max-size 1G --max-age 30d \
                 -u --no-update-modtime "gallery/desktop-wallpapers/" GPhotos-Personal:/album/Desktop-Wallpapers/
-                
-                curl https://graph.edc0.com/edc0/autumn/darkcamel?entry_url=$url
-
+            
           	  ;;
           	  *gallery/mobile-wallpaper* )
                 rclone --config rclone.conf copy -v --check-first --size-only --ignore-existing --max-size 1G --max-age 30d \
                 -u --no-update-modtime "gallery/mobile-wallpapers/" GPhotos-Personal:/album/IOS-Wallpapers/
-                
-                curl https://graph.edc0.com/edc0/autumn/darkcamel?entry_url=$url
           	  ;;
           	  esac
               sleep 2
@@ -74,3 +63,7 @@ jobs:
           else 
           	echo "No modified files";
           fi
+      - name: Delete artifact 🗑️
+        uses: geekyeggo/delete-artifact@v4
+        with:
+          name: gh-pages
