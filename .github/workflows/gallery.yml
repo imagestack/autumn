@@ -33,6 +33,7 @@ jobs:
           cat << EOF > ./rclone.conf
           ${{ secrets.OBJSTACK_RCLONE_CONF }}
           EOF
+          sudo apt update -y
           sudo apt install -y rclone
       
           files=($(git --no-pager show --oneline --name-only --pretty='' HEAD))
