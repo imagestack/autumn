@@ -50,7 +50,7 @@ jobs:
           	    
           	  case "$f" in
           	  *gallery/desktop-wallpapers* )
-                rclone --config rclone.conf copy -v --check-first --size-only --ignore-existing --max-size 1G --max-age 30d \
+                rclone --config rclone.conf copy -v --exclude .gitkeep --check-first --size-only --ignore-existing --max-size 1G --max-age 30d \
                 -u --no-update-modtime "gallery/desktop-wallpapers/" GPhotos-Personal:/album/Desktop-Wallpapers/
             
           	  ;;
