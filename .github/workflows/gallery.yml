@@ -1,5 +1,5 @@
 name: Publish Gallery
-on: [push, workflow_dispatch]
+on: [workflow_dispatch]
 
 permissions:
   id-token: write
@@ -13,7 +13,7 @@ jobs:
       - name: Checkout 🛎️
         uses:  actions/checkout@v4
         with:
-          persist-credentials: false
+          fetch-depth: 0
       - name: Build Gallery 🔧
         run: docker run -v "$(pwd):/work" ghcr.io/thumbsup/thumbsup /bin/sh -c "cd /work/ && thumbsup --config config.json"
       - name: Package and upload artifact 📦
@@ -44,6 +44,7 @@ jobs:
           	IFS=""
           	for f in ${files[@]};
           	do
+              echo "Processing: $f"
           	  file_part=$(echo "$f" | awk -F "gallery/" '{print $NF}')
           	  url="https://darkcamel.edc0.com/media/large/$file_part"
           	    
